@@ -52,4 +52,4 @@ steps:
             source: "#tumour_pileup.output"
 
 
-outputs: []
+outputs: [snp_vcf,indel_vcf]
