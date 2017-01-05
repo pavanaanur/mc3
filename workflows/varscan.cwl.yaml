@@ -41,4 +41,4 @@ steps:
       outputs:
         - id: "#tumour_pileup.output"
 
-outputs: [snp_vcf,indel_vcf]
+outputs: []
