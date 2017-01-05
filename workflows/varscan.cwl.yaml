@@ -1,5 +1,6 @@
 class: Workflow
 id: varscan_workflow
+cwlVersion: v1.0
 
 inputs:
   - id: "#tumor"
@@ -40,5 +41,15 @@ steps:
 
       outputs:
         - id: "#tumour_pileup.output"
+        
+     - id: varscan
+        run:
+          import: ../tools/varscan-tool/varscan_somatic.cwl.yaml
+        inputs:
+          - id: normal_pileup
+            source: "#normal_pileup.output"
+          - id: tumor_pileup
+            source: "#tumour_pileup.output"
+
 
 outputs: []
