@@ -1,57 +1,46 @@
+#!/usr/bin/env cwl-runner
+
 class: Workflow
-id: varscan_workflow
 cwlVersion: v1.0
 
 inputs:
-  - id: tumor
+  tumor:
+   type: File
+   secondaryFiles:
+      - .bai
+
+  normal:
     type: File
     secondaryFiles:
       - .bai
 
-  - id: normal
-    type: File
-    secondaryFiles:
-      - .bai
-
-  - id: reference
+  reference:
     type: File
     secondaryFiles:
       - .fai
 
+outputs: 
+    type: File
+    outputSource: varscan/snp_vcf
+
 steps:
-    - id: normal_pileup
-      run:
-        import: ../tools/samtools-pileup-tool/sam_pileup.cwl.yaml
-      inputs:
-        - id: input
-          source: normal
-        - id: reference
-          source: reference
+  normal_pileup:
+   run: ../tools/samtools-pileup-tool/sam_pileup.cwl.yaml
+   in:
+    input:normal
+    reference:reference
+   out: [normal_pileup_output]
 
-      outputs:
-        - id: [normal_pileup.output]
-        
-    - id: tumor_pileup
-      run:
-        import: ../tools/samtools-pileup-tool/sam_pileup.cwl.yaml
-      inputs:
-        - id: input
-          source: tumor
-        - id: reference
-          source: reference
-
-      outputs:
-        - id: [tumour_pileup.output]
-        
-     - id: varscan
-        run:
-          import: ../tools/varscan-tool/varscan_somatic.cwl.yaml
-        inputs:
-          - id: normal_pileup
-            source: normal_pileup/normal_pileup.output
-          - id: tumor_pileup
-            source: tumor_pileup/tumour_pileup.output
-
-
-outputs: []
+   tumor_pileup:
+   run: ../tools/samtools-pileup-tool/sam_pileup.cwl.yaml
+   in:
+    input:tumor
+    reference:reference
+   out: [tumor_pileup_output]
       
+  varscan:
+   run: ../tools/varscan-tool/varscan_somatic.cwl.yaml
+   in:
+    normal_pileup: normal_pileup/normal_pileup_output
+    tumor_pileup: tumor_pileup/tumour_pileup_output
+   out: [snp_vcf]
